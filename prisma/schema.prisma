@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // or "mysql", "sqlite", etc.
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -21,14 +21,14 @@ model Teacher {
 }
 
 model Student {
-  id      Int     @id @default(autoincrement())
-  name    String
-  email   String  @unique
-  phone   String
-  batch   Int
-  year    Int
-  section String
-  faculty Faculty
+  id       Int     @id @default(autoincrement())
+  name     String
+  email    String  @unique
+  password String
+  phone    String
+  year     Int
+  section  Section
+  faculty  Faculty
 
   attendances   Attendance[]
   internalMarks InternalMarks[]
@@ -75,11 +75,11 @@ model InternalMarks {
 }
 
 model Notes {
-  id      Int    @id @default(autoincrement())
+  id      Int     @id @default(autoincrement())
   title   String
   file    String
   year    Int
-  section String
+  section Section
 
   faculty   Faculty
   subjectId Int
@@ -90,11 +90,11 @@ model Notes {
 }
 
 model Notice {
-  id          Int    @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   title       String
   description String
   year        Int
-  section     String
+  section     Section
 
   faculty   Faculty
   subjectId Int
@@ -109,4 +109,9 @@ enum Faculty {
   CIVIL
   MECHANICAL
   ELECTRICAL
+}
+
+enum Section {
+  AB
+  CD
 }
