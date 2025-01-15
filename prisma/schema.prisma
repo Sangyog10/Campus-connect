@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // or "mysql", "sqlite", etc.
+  url      = env("DATABASE_URL")
+}
+
+model Teacher {
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
+  phone    String
+
+  attendances   Attendance[]
+  internalMarks InternalMarks[]
+  notes         Notes[]
+  notices       Notice[]
+}
+
+model Student {
+  id      Int     @id @default(autoincrement())
+  name    String
+  email   String  @unique
+  phone   String
+  batch   Int
+  year    Int
+  section String
+  faculty Faculty
+
+  attendances   Attendance[]
+  internalMarks InternalMarks[]
+}
+
+model Subject {
+  id      Int     @id @default(autoincrement())
+  name    String
+  faculty Faculty
+
+  attendances   Attendance[]
+  internalMarks InternalMarks[]
+  notes         Notes[]
+  notices       Notice[]
+}
+
+model Attendance {
+  id      Int      @id @default(autoincrement())
+  date    DateTime
+  present Boolean
+
+  teacherId Int
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+
+  subjectId Int
+  subject   Subject @relation(fields: [subjectId], references: [id])
+
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [id])
+}
+
+model InternalMarks {
+  id    Int   @id @default(autoincrement())
+  marks Float
+
+  teacherId Int
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+
+  subjectId Int
+  subject   Subject @relation(fields: [subjectId], references: [id])
+
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [id])
+}
+
+model Notes {
+  id      Int    @id @default(autoincrement())
+  title   String
+  file    String
+  year    Int
+  section String
+
+  faculty   Faculty
+  subjectId Int
+  subject   Subject @relation(fields: [subjectId], references: [id])
+
+  teacherId Int
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+}
+
+model Notice {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+  year        Int
+  section     String
+
+  faculty   Faculty
+  subjectId Int
+  subject   Subject @relation(fields: [subjectId], references: [id])
+
+  teacherId Int
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+}
+
+enum Faculty {
+  COMPUTER
+  CIVIL
+  MECHANICAL
+  ELECTRICAL
+}
