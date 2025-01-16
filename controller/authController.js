@@ -84,6 +84,7 @@ const registerStudent = async (req, res) => {
     throw new BadRequestError("Account already exists");
   }
   const hashedPassword = await hashPassword(phone);
+
   const student = await prismaClient.student.create({
     data: {
       name,
