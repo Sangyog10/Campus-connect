@@ -17,8 +17,10 @@ app.use(cors());
 
 app.use("/api/v1/auth", authRouter);
 
-app.get("/test", (req, res) => {
-  res.json({ msg: "test" });
+app.get("/", (req, res) => {
+  res.json({
+    msg: "Welcome to campus-connect server where you cannot connect with others ",
+  });
 });
 
 app.use(notFoundMiddleware);
