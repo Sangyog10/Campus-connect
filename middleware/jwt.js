@@ -5,12 +5,14 @@ const createJWT = ({ payload }) => {
   return token;
 };
 
-const isTokenValid = ({ token }) => jwt.verify(token, process.env.JWT_SECRET);
+const isTokenValid = async (token) => jwt.verify(token, process.env.JWT_SECRET);
 
 const attachCookiesToResponse = ({ res, user }) => {
   const token = createJWT({ payload: user });
   res.cookie("token", token, {
     expires: new Date(Date.now() + 900000),
+    httpOnly: true,
+    secure: true,
   });
 };
 
