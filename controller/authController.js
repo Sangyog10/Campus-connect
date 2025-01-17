@@ -67,8 +67,8 @@ const loginTeacher = async (req, res) => {
  * phone number will be used as default password while registering student
  */
 const registerStudent = async (req, res) => {
-  const { name, email, phone, year, section, faculty } = req.body;
-  if (!name || !email || !phone || !year || !section || !faculty) {
+  const { name, email, phone, semester, section, faculty } = req.body;
+  if (!name || !email || !phone || !semester || !section || !faculty) {
     throw new BadRequestError("Enter all credentials");
   }
   const emailExists = await prismaClient.student.findFirst({
@@ -86,7 +86,7 @@ const registerStudent = async (req, res) => {
       name,
       email,
       phone,
-      year,
+      semester,
       section,
       faculty,
       password: hashedPassword,

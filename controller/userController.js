@@ -9,7 +9,7 @@ const getAllstudents = async (req, res) => {
       name: true,
       email: true,
       phone: true,
-      year: true,
+      semester: true,
       section: true,
       faculty: true,
     },
@@ -22,16 +22,16 @@ const getAllstudents = async (req, res) => {
 };
 
 const getAllstudentsBySection = async (req, res) => {
-  const { faculty, year, section } = req.body;
+  const { faculty, semester, section } = req.body;
 
   const students = await prismaClient.student.findMany({
-    where: { faculty, year, section },
+    where: { faculty, semester, section },
     select: {
       id: true,
       name: true,
       email: true,
       phone: true,
-      year: true,
+      semester: true,
       section: true,
       faculty: true,
     },
@@ -44,16 +44,16 @@ const getAllstudentsBySection = async (req, res) => {
 };
 
 const getAllstudentsByFaculty = async (req, res) => {
-  const { faculty, year } = req.body;
+  const { faculty, semester } = req.body;
 
   const students = await prismaClient.student.findMany({
-    where: { faculty, year },
+    where: { faculty, semester },
     select: {
       id: true,
       name: true,
       email: true,
       phone: true,
-      year: true,
+      semester: true,
       section: true,
       faculty: true,
     },

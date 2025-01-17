@@ -12,6 +12,8 @@ import userRouter from "./route/userRoute.js";
 import attendenceRouter from "./route/attendenceRoute.js";
 import noticeRouter from "./route/noticeRoute.js";
 import marksRouter from "./route/marksRoute.js";
+import teacherRouter from "./route/teacherRoute.js";
+import subjectRouter from "./route/subjectRoute.js";
 
 const app = express();
 
@@ -24,6 +26,8 @@ app.use("/api/v1/details", userRouter);
 app.use("/api/v1/attendence", attendenceRouter);
 app.use("/api/v1/notice", noticeRouter);
 app.use("/api/v1/marks", marksRouter);
+app.use("/api/v1/teacher", teacherRouter);
+app.use("/api/v1/subject", subjectRouter);
 
 app.get("/", (req, res) => {
   res.json({

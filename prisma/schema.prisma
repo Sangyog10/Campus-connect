@@ -18,6 +18,8 @@ model Teacher {
   internalMarks InternalMarks[]
   notes         Notes[]
   notices       Notice[]
+  subjects      Subject[]       @relation("TeacherSubjects")
+  Subject       Subject[]
 }
 
 model Student {
@@ -26,7 +28,7 @@ model Student {
   email    String  @unique
   password String
   phone    String
-  year     Int
+  semester Int
   section  Section
   faculty  Faculty
 
@@ -35,14 +37,18 @@ model Student {
 }
 
 model Subject {
-  id      Int     @id @default(autoincrement())
-  name    String
-  faculty Faculty
+  id       Int     @id @default(autoincrement())
+  name     String
+  faculty  Faculty
+  semester Int
 
   attendances   Attendance[]
   internalMarks InternalMarks[]
   notes         Notes[]
   notices       Notice[]
+  teachers      Teacher[]       @relation("TeacherSubjects")
+  Teacher       Teacher?        @relation(fields: [teacherId], references: [id])
+  teacherId     Int?
 }
 
 model Attendance {
@@ -75,11 +81,11 @@ model InternalMarks {
 }
 
 model Notes {
-  id      Int     @id @default(autoincrement())
-  title   String
-  file    String
-  year    Int
-  section Section
+  id       Int     @id @default(autoincrement())
+  title    String
+  file     String
+  semester Int
+  section  Section
 
   faculty   Faculty
   subjectId Int
@@ -93,7 +99,7 @@ model Notice {
   id          Int     @id @default(autoincrement())
   title       String
   description String
-  year        Int
+  semester    Int
   section     Section
 
   faculty   Faculty
