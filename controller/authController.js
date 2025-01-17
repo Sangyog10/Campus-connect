@@ -6,11 +6,7 @@ import {
   BadRequestError,
   UnauthorizedError,
 } from "../errors/index.js";
-import {
-  createJWT,
-  isTokenValid,
-  attachCookiesToResponse,
-} from "../middleware/jwt.js";
+import { attachCookiesToResponse } from "../middleware/jwt.js";
 import { hashPassword, verifyPassword } from "../utils/verify.js";
 
 const registerTeacher = async (req, res) => {
