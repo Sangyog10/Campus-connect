@@ -4,6 +4,7 @@ import {
   showAllMarks,
   getIndividualMarks,
 } from "../controller/marksController.js";
+import { authenticateUser } from "../middleware/authenticateUser.js";
 
 const router = Router();
 
