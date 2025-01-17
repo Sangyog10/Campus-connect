@@ -28,7 +28,7 @@ model Student {
   email    String  @unique
   password String
   phone    String
-  semester Int
+  semester String
   section  Section
   faculty  Faculty
 
@@ -38,9 +38,9 @@ model Student {
 
 model Subject {
   id       Int     @id @default(autoincrement())
-  name     String
+  name     String  @unique
   faculty  Faculty
-  semester Int
+  semester String
 
   attendances   Attendance[]
   internalMarks InternalMarks[]
@@ -64,6 +64,11 @@ model Attendance {
 
   studentId Int
   student   Student @relation(fields: [studentId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([teacherId, subjectId, studentId])
 }
 
 model InternalMarks {
@@ -84,7 +89,7 @@ model Notes {
   id       Int     @id @default(autoincrement())
   title    String
   file     String
-  semester Int
+  semester String
   section  Section
 
   faculty   Faculty
@@ -99,7 +104,7 @@ model Notice {
   id          Int     @id @default(autoincrement())
   title       String
   description String
-  semester    Int
+  semester    String
   section     Section
 
   faculty   Faculty

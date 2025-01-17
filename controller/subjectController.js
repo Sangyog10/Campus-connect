@@ -32,7 +32,7 @@ const getSubjectsByFaculty = async (req, res) => {
   const subjects = await prismaClient.subject.findMany({
     where: {
       faculty,
-      semester: parseInt(semester),
+      semester,
     },
     select: {
       id: true,
