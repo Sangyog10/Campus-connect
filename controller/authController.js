@@ -60,7 +60,7 @@ const loginTeacher = async (req, res) => {
 
   res
     .status(StatusCodes.ACCEPTED)
-    .json({ success: true, message: "Student logged in successfully" });
+    .json({ success: true, message: "Teacher logged in successfully" });
 };
 
 /**
