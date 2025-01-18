@@ -5,7 +5,10 @@ import {
   getAllstudentsByFaculty,
   myDetails,
 } from "../controller/userController.js";
-import { authenticateUser } from "../middleware/authenticateUser.js";
+import {
+  authenticateUser,
+  authorizeRoles,
+} from "../middleware/authenticateUser.js";
 import { Router } from "express";
 
 const router = Router();
