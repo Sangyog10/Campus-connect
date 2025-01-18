@@ -13,6 +13,7 @@ model Teacher {
   email    String @unique
   password String
   phone    String
+  role     String @default("teacher")
 
   attendances   Attendance[]
   internalMarks InternalMarks[]
@@ -31,6 +32,7 @@ model Student {
   semester String
   section  Section
   faculty  Faculty
+  role     String  @default("student")
 
   attendances   Attendance[]
   internalMarks InternalMarks[]

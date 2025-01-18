@@ -1,6 +1,41 @@
 import { prismaClient } from "../db/connect.js";
 import { StatusCodes } from "http-status-codes";
-import { BadRequestError } from "../errors/index.js";
+import {
+  BadRequestError,
+  NotFoundError,
+  UnauthenticatedError,
+} from "../errors/index.js";
+
+const myDetails = async (req, res) => {
+  const userId = req.user.userId;
+  const userType = req.user.role;
+
+  if (!userId) {
+    throw new UnauthenticatedError("please login");
+  }
+  let userDetails;
+
+  if (userType === "teacher") {
+    userDetails = await prismaClient.teacher.findUnique({
+      where: { id: Number(userId) },
+    });
+  } else if (userType === "student") {
+    userDetails = await prismaClient.student.findUnique({
+      where: { id: Number(userId) },
+    });
+  } else {
+    throw new UnauthenticatedError("Invalid user");
+  }
+
+  if (!userDetails) {
+    throw new NotFoundError("User not found");
+  }
+
+  res.status(StatusCodes.ACCEPTED).json({
+    success: true,
+    data: userDetails,
+  });
+};
 
 const getAllstudents = async (req, res) => {
   const students = await prismaClient.student.findMany({
@@ -85,4 +120,5 @@ export {
   getAllstudents,
   getAllstudentsBySection,
   getAllstudentsByFaculty,
+  myDetails,
 };

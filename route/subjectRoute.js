@@ -1,4 +1,7 @@
-import { authenticateUser } from "../middleware/authenticateUser.js";
+import {
+  authenticateUser,
+  authorizeRoles,
+} from "../middleware/authenticateUser.js";
 import { Router } from "express";
 import {
   addSubject,
