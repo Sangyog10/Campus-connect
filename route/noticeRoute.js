@@ -7,7 +7,7 @@ import {
 
 const router = Router();
 
-router.get("/", getNotice);
-router.post("/", authorizeRoles("teacher"), addNotice);
+router.post("/add", authenticateUser, authorizeRoles("teacher"), addNotice);
+router.get("/my-notice", authenticateUser, getNotice);
 
 export default router;

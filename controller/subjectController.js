@@ -12,6 +12,16 @@ const addSubject = async (req, res) => {
   if (!name || !faculty || !semester) {
     throw new BadRequestError("Please enter all details");
   }
+  const isSubjectAdded = await prismaClient.subject.findFirst({
+    where: {
+      semester,
+      name,
+    },
+  });
+  if (isSubjectAdded) {
+    throw new BadRequestError("This subject has already been added");
+  }
+
   const subjects = await prismaClient.subject.create({
     data: {
       name,
