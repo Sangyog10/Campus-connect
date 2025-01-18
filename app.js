@@ -14,12 +14,15 @@ import noticeRouter from "./route/noticeRoute.js";
 import marksRouter from "./route/marksRoute.js";
 import teacherRouter from "./route/teacherRoute.js";
 import subjectRouter from "./route/subjectRoute.js";
+import notesRouter from "./route/notesRoute.js";
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
+
+app.use("/uploads", express.static("uploads"));
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/details", userRouter);
@@ -28,6 +31,7 @@ app.use("/api/v1/notice", noticeRouter);
 app.use("/api/v1/marks", marksRouter);
 app.use("/api/v1/teacher", teacherRouter);
 app.use("/api/v1/subject", subjectRouter);
+app.use("/api/v1/notes", notesRouter);
 
 app.get("/", (req, res) => {
   res.json({
