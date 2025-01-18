@@ -1,4 +1,4 @@
-import { UnauthenticatedError } from "../errors/index.js";
+import { UnauthenticatedError, UnauthorizedError } from "../errors/index.js";
 import { isTokenValid } from "./jwt.js";
 import { prismaClient } from "../db/connect.js";
 
@@ -12,7 +12,7 @@ const authenticateUser = async (req, res, next) => {
     const payload = await isTokenValid(token);
 
     const studentUser = await prismaClient.student.findUnique({
-      where: { id: payload.id },
+      where: { email: payload.email },
     });
 
     //student vetiyo
@@ -25,7 +25,7 @@ const authenticateUser = async (req, res, next) => {
       return next();
     }
     const teacherUser = await prismaClient.teacher.findUnique({
-      where: { id: payload.id },
+      where: { email: payload.email },
     });
 
     //teacher vetiyo
@@ -50,10 +50,9 @@ const authenticateUser = async (req, res, next) => {
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
-        success: false,
-        message: "You do not have permission to perform this action",
-      });
+      throw new UnauthorizedError(
+        "You do not have permission to perform this action"
+      );
     }
     next();
   };
