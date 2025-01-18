@@ -1,5 +1,6 @@
 import { UnauthenticatedError } from "../errors/index.js";
 import { isTokenValid } from "./jwt.js";
+import { prismaClient } from "../db/connect.js";
 
 const authenticateUser = async (req, res, next) => {
   let token = req.cookies.token;
