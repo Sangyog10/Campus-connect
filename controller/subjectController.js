@@ -8,14 +8,13 @@ import {
 } from "../errors/index.js";
 
 const addSubject = async (req, res) => {
-  const { name, faculty, semester } = req.body;
-  if (!name || !faculty || !semester) {
+  const { name, subjectCode, faculty, semester } = req.body;
+  if (!subjectCode || !faculty || !semester || !name) {
     throw new BadRequestError("Please enter all details");
   }
-  const isSubjectAdded = await prismaClient.subject.findFirst({
+  const isSubjectAdded = await prismaClient.subject.findUnique({
     where: {
-      semester,
-      name,
+      subjectCode,
     },
   });
   if (isSubjectAdded) {
@@ -25,6 +24,7 @@ const addSubject = async (req, res) => {
   const subjects = await prismaClient.subject.create({
     data: {
       name,
+      subjectCode,
       faculty,
       semester,
     },

@@ -7,38 +7,44 @@ import {
 } from "../errors/index.js";
 
 const assignSubjectToTeacher = async (req, res) => {
-  const { subjectId } = req.body;
+  const { faculty, semester, section, subjectCode } = req.body;
   const teacherId = req.user.userId;
 
-  if (!subjectId) {
+  if (!faculty || !semester || !section || !subjectCode) {
     throw new BadRequestError("Please provide all details");
   }
   if (!teacherId) {
     throw new UnauthenticatedError("Please login");
   }
+
   const teacher = await prismaClient.teacher.findUnique({
     where: { id: parseInt(teacherId) },
   });
-  const subject = await prismaClient.subject.findUnique({
-    where: { id: parseInt(subjectId) },
-  });
   if (!teacher) {
-    throw new NotFoundError("Teacher with this id not found");
+    throw new NotFoundError("Teacher with the provided ID not found.");
   }
+
+  const subject = await prismaClient.subject.findUnique({
+    where: { subjectCode },
+  });
   if (!subject) {
-    throw new NotFoundError("Subject with this id not found");
+    throw new NotFoundError("Subject with the provided code not found.");
   }
-  await prismaClient.teacher.update({
-    where: { id: teacherId },
+
+  await prismaClient.subject.update({
+    where: { subjectCode },
     data: {
-      subjects: {
-        connect: { id: subjectId },
+      teachers: {
+        connect: { id: teacherId },
       },
+      teacherId: teacherId,
     },
   });
-  res
-    .status(StatusCodes.CREATED)
-    .json({ success: true, message: "Subject added successfully" });
+
+  res.status(StatusCodes.CREATED).json({
+    success: true,
+    message: "Subject assigned to teacher successfully",
+  });
 };
 
 const getAllSubjectOfTeacher = async (req, res) => {

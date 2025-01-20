@@ -39,10 +39,11 @@ model Student {
 }
 
 model Subject {
-  id       Int     @id @default(autoincrement())
-  name     String  @unique
-  faculty  Faculty
-  semester String
+  id          Int     @id @default(autoincrement())
+  name        String
+  faculty     Faculty
+  semester    String
+  subjectCode String  @unique
 
   attendances   Attendance[]
   internalMarks InternalMarks[]
