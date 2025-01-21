@@ -38,6 +38,7 @@ const assignSubjectToTeacher = async (req, res) => {
         connect: { id: teacherId },
       },
       teacherId: teacherId,
+      section: section,
     },
   });
 
@@ -62,6 +63,11 @@ const getAllSubjectOfTeacher = async (req, res) => {
   if (!teacher) {
     throw new NotFoundError("No subjects found");
   }
+
+  const subjects = teacher.subjects.map((subject) => ({
+    ...subject,
+    section: subject.section,
+  }));
   res
     .status(StatusCodes.CREATED)
     .json({ success: true, subjects: teacher.subjects });
