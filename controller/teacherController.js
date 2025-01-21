@@ -25,14 +25,28 @@ const assignSubjectToTeacher = async (req, res) => {
   }
 
   const subject = await prismaClient.subject.findUnique({
-    where: { subjectCode },
+    where: {
+      subjectCode_faculty_semester: {
+        subjectCode,
+        faculty,
+        semester,
+      },
+    },
   });
   if (!subject) {
-    throw new NotFoundError("Subject with the provided code not found.");
+    throw new NotFoundError(
+      "Subject with the provided code, faculty, and semester not found."
+    );
   }
 
   await prismaClient.subject.update({
-    where: { subjectCode },
+    where: {
+      subjectCode_faculty_semester: {
+        subjectCode,
+        faculty,
+        semester,
+      },
+    },
     data: {
       teachers: {
         connect: { id: teacherId },

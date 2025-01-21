@@ -7,7 +7,6 @@ import {
   UnauthorizedError,
 } from "../errors/index.js";
 
-//endpoint to add attendence by teacher
 const addAttendence = async (req, res) => {
   const { date, attendanceData, subjectId } = req.body;
   const teacherId = req.user.userId;
@@ -17,6 +16,14 @@ const addAttendence = async (req, res) => {
   if (!teacherId) {
     throw new UnauthenticatedError("Please login");
   }
+  const subjectAvailable = await prismaClient.subject.findUnique({
+    where: { id: subjectId },
+  });
+
+  if (!subjectAvailable) {
+    throw new NotFoundError("Subject with this id not found");
+  }
+
   const attendanceRecords = await Promise.all(
     attendanceData.map(async (record) => {
       return prismaClient.attendance.create({

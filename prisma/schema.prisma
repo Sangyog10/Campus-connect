@@ -44,7 +44,7 @@ model Subject {
   name        String
   faculty     Faculty
   semester    String
-  subjectCode String   @unique
+  subjectCode String
   section     Section?
 
   attendances   Attendance[]
@@ -54,6 +54,8 @@ model Subject {
   teachers      Teacher[]       @relation("TeacherSubjects")
   Teacher       Teacher?        @relation(fields: [teacherId], references: [id])
   teacherId     Int?
+
+  @@unique([subjectCode, faculty, semester])
 }
 
 model Attendance {
