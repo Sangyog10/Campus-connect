@@ -55,8 +55,14 @@ const getNotice = async (req, res) => {
   if (!userId) {
     throw new UnauthenticatedError("Please login");
   }
+
   const student = await prismaClient.student.findUnique({
     where: { id: Number(userId) },
+    select: {
+      id: true,
+      section: true,
+      semester: true,
+    },
   });
 
   if (!student) {
@@ -64,6 +70,10 @@ const getNotice = async (req, res) => {
   }
 
   const notices = await prismaClient.notice.findMany({
+    where: {
+      section: student.section,
+      semester: student.semester,
+    },
     include: {
       subject: {
         select: {
@@ -77,6 +87,7 @@ const getNotice = async (req, res) => {
       },
     },
   });
+
   const formattedNotices = notices.map((notice) => ({
     id: notice.id,
     title: notice.title,
@@ -89,7 +100,7 @@ const getNotice = async (req, res) => {
 
   res.status(StatusCodes.OK).json({
     success: true,
-    notice: formattedNotices,
+    notices: formattedNotices,
   });
 };
 
