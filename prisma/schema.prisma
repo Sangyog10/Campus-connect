@@ -55,7 +55,7 @@ model Subject {
   Teacher       Teacher?        @relation(fields: [teacherId], references: [id])
   teacherId     Int?
 
-  @@unique([subjectCode, faculty, semester])
+  @@unique([subjectCode, faculty, semester, section])
 }
 
 model Attendance {

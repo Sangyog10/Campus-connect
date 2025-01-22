@@ -40,6 +40,11 @@ const addSubject = async (req, res) => {
     .json({ success: true, message: "Added subject", data: subject });
 };
 
+/**
+ * To fix:
+ * Gives duplicate value of subject(assigned to section)
+ * eg: EMX(AB secton) and EMX(CD section)
+ */
 const getSubjectsByFaculty = async (req, res) => {
   const { faculty, semester } = req.body;
   if (!faculty || !semester) {
@@ -55,6 +60,7 @@ const getSubjectsByFaculty = async (req, res) => {
       name: true,
       faculty: true,
       semester: true,
+      subjectCode: true,
     },
   });
   if (subjects.length === 0) {
