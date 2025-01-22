@@ -46,8 +46,7 @@ const addNotice = async (req, res) => {
   });
   res.status(StatusCodes.CREATED).json({
     success: true,
-    message: "Notice created and dispatched successfully",
-    data: notice,
+    message: "Notice created successfully",
   });
 };
 

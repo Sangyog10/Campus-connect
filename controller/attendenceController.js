@@ -42,7 +42,7 @@ const addAttendence = async (req, res) => {
     .json({ success: true, message: "Attendence addded successfully" });
 };
 
-//route to get the total attendence in each subject
+//route to get the total attendence in each subject of a student
 const getAttendenceOfSubject = async (req, res) => {
   const studentId = req.user.userId;
   if (!studentId) {
@@ -114,4 +114,100 @@ const getAttendenceOfSubject = async (req, res) => {
   });
 };
 
-export { addAttendence, getAttendenceOfSubject };
+//route to get all the attendence details of the subject that a teacher teaches
+const getSubjectAttendance = async (req, res) => {
+  const teacherId = req.user.userId;
+  const { subjectCode, section } = req.body;
+
+  if (!teacherId) {
+    throw new UnauthenticatedError("Please login.");
+  }
+
+  if (!subjectCode || !section) {
+    throw new BadRequestError("Please provide subject code and section.");
+  }
+
+  const subject = await prismaClient.subject.findFirst({
+    where: {
+      subjectCode,
+      section,
+      teachers: {
+        some: { id: parseInt(teacherId) },
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      faculty: true,
+      semester: true,
+      section: true,
+    },
+  });
+
+  if (!subject) {
+    throw new NotFoundError("The subject is not assigned to teacher");
+  }
+
+  const attendanceRecords = await prismaClient.attendance.groupBy({
+    by: ["studentId"],
+    where: {
+      subjectId: subject.id,
+      teacherId: parseInt(teacherId),
+    },
+    _count: {
+      _all: true,
+    },
+  });
+
+  const presentCounts = await prismaClient.attendance.groupBy({
+    by: ["studentId"],
+    where: {
+      subjectId: subject.id,
+      teacherId: parseInt(teacherId),
+      present: true,
+    },
+    _count: {
+      _all: true,
+    },
+  });
+
+  const presentMap = presentCounts.reduce((map, record) => {
+    map[record.studentId] = record._count._all;
+    return map;
+  }, {});
+
+  const studentAttendance = await Promise.all(
+    attendanceRecords.map(async (record) => {
+      const student = await prismaClient.student.findUnique({
+        where: { id: record.studentId },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      });
+
+      return {
+        studentId: student.id,
+        name: student.name,
+        email: student.email,
+        totalClassesAttended: presentMap[record.studentId] || 0,
+        totalClassesConducted: record._count._all,
+      };
+    })
+  );
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    subject: {
+      name: subject.name,
+      code: subjectCode,
+      section: subject.section,
+      semester: subject.semester,
+      faculty: subject.faculty,
+    },
+    attendance: studentAttendance,
+  });
+};
+
+export { addAttendence, getAttendenceOfSubject, getSubjectAttendance };

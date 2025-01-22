@@ -1,6 +1,5 @@
 import { prismaClient } from "../db/connect.js";
 import { StatusCodes } from "http-status-codes";
-import path from "path";
 import {
   NotFoundError,
   BadRequestError,

@@ -131,4 +131,5 @@ const getAllSubjectOfTeacher = async (req, res) => {
     subjects,
   });
 };
+
 export { assignSubjectToTeacher, getAllSubjectOfTeacher };
