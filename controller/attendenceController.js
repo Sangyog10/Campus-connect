@@ -28,7 +28,7 @@ const addAttendence = async (req, res) => {
     attendanceData.map(async (record) => {
       return prismaClient.attendance.create({
         data: {
-          date: new Date(date),
+          date: new Date(Date.now()),
           present: record.present,
           teacherId,
           subjectId,
@@ -37,9 +37,10 @@ const addAttendence = async (req, res) => {
       });
     })
   );
-  res
-    .status(StatusCodes.OK)
-    .json({ success: true, message: "Attendance added successfully" });
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: "Attendance added successfully",
+  });
 };
 
 //student route to get his/her attendence
@@ -114,6 +115,12 @@ const getAttendenceOfSubject = async (req, res) => {
   });
 };
 
+/**
+ * fix:
+ * 1.(totalClassConducted) while adding all false, the total attencde increase accoring to student number
+ * 2.
+ */
+
 // route to get all the attendance details of the subject that a teacher teaches
 const getSubjectAttendance = async (req, res) => {
   const teacherId = req.user.userId;
@@ -148,12 +155,15 @@ const getSubjectAttendance = async (req, res) => {
     throw new NotFoundError("The subject is not assigned to teacher");
   }
 
-  const totalClassesConducted = await prismaClient.attendance.count({
+  const totalClasses = await prismaClient.attendance.groupBy({
+    by: ["date", "teacherId", "subjectId"],
     where: {
       subjectId: subject.id,
       teacherId,
     },
   });
+
+  const totalClassesConducted = totalClasses.length;
 
   const attendanceRecords = await prismaClient.attendance.groupBy({
     by: ["studentId"],
