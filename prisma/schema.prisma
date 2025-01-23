@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Teacher {
-  id       Int      @id @default(autoincrement())
+  id       String   @id @default(cuid())
   name     String
   email    String   @unique
   password String
@@ -25,7 +25,7 @@ model Teacher {
 }
 
 model Student {
-  id       Int     @id @default(autoincrement())
+  id       String  @id @default(cuid())
   name     String
   email    String  @unique
   password String
@@ -40,39 +40,36 @@ model Student {
 }
 
 model Subject {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(cuid())
   name        String
   faculty     Faculty
   semester    String
   subjectCode String
   section     Section?
 
-  attendances   Attendance[]
-  internalMarks InternalMarks[]
-  notes         Notes[]
-  notices       Notice[]
-  teachers      Teacher[]       @relation("TeacherSubjects")
-  Teacher       Teacher?        @relation(fields: [teacherId], references: [id])
-  teacherId     Int?
+  attendances     Attendance[]
+  internalMarks   InternalMarks[]
+  notes           Notes[]
+  notices         Notice[]
+  teachers        Teacher[]       @relation("TeacherSubjects")
+  assignedTeacher Teacher?        @relation(fields: [teacherId], references: [id])
+  teacherId       String?
 
   @@unique([subjectCode, faculty, semester, section])
 }
 
 model Attendance {
-  id      Int      @id @default(autoincrement())
+  id      String   @id @default(cuid())
   date    DateTime
   present Boolean
   section Section?
 
-  teacherId Int
-  teacher   Teacher @relation(fields: [teacherId], references: [id])
-
-  subjectId Int
-  subject   Subject @relation(fields: [subjectId], references: [id])
-
-  studentId Int
-  student   Student @relation(fields: [studentId], references: [id])
-
+  teacherId String
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+  subjectId String
+  subject   Subject  @relation(fields: [subjectId], references: [id])
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -80,47 +77,43 @@ model Attendance {
 }
 
 model InternalMarks {
-  id      Int      @id @default(autoincrement())
+  id      String   @id @default(cuid())
   marks   Float
   section Section?
 
-  teacherId Int
+  teacherId String
   teacher   Teacher @relation(fields: [teacherId], references: [id])
-
-  subjectId Int
+  subjectId String
   subject   Subject @relation(fields: [subjectId], references: [id])
-
-  studentId Int
+  studentId String
   student   Student @relation(fields: [studentId], references: [id])
 }
 
 model Notes {
-  id       Int     @id @default(autoincrement())
+  id       String  @id @default(cuid())
   title    String
   file     String
   semester String
   section  Section
+  faculty  Faculty
 
-  faculty   Faculty
-  subjectId Int
+  subjectId String
   subject   Subject @relation(fields: [subjectId], references: [id])
-
-  teacherId Int
+  teacherId String
   teacher   Teacher @relation(fields: [teacherId], references: [id])
 }
 
 model Notice {
-  id          Int     @id @default(autoincrement())
+  id          String  @id @default(cuid())
   title       String
   description String
   semester    String
   section     Section
+  faculty     Faculty
 
-  faculty   Faculty
-  subjectId Int
+  subjectId String
   subject   Subject @relation(fields: [subjectId], references: [id])
-
-  teacherId Int
+  teacherId String
   teacher   Teacher @relation(fields: [teacherId], references: [id])
 }
 

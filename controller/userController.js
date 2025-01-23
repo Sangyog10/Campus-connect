@@ -7,37 +7,37 @@ import {
 } from "../errors/index.js";
 
 const myDetails = async (req, res) => {
-  const userId = req.user.userId;
-  const userType = req.user.role;
+  const { userId, role: userType } = req.user;
 
   if (!userId) {
-    throw new UnauthenticatedError("please login");
+    throw new UnauthenticatedError("Please log in");
   }
+
   let userDetails;
 
   if (userType === "teacher") {
     userDetails = await prismaClient.teacher.findUnique({
-      where: { id: Number(userId) },
+      where: { id: userId },
     });
   } else if (userType === "student") {
     userDetails = await prismaClient.student.findUnique({
-      where: { id: Number(userId) },
+      where: { id: userId },
     });
   } else {
-    throw new UnauthenticatedError("Invalid user");
+    throw new UnauthenticatedError("Invalid user type");
   }
 
   if (!userDetails) {
     throw new NotFoundError("User not found");
   }
 
-  res.status(StatusCodes.ACCEPTED).json({
+  res.status(StatusCodes.OK).json({
     success: true,
     data: userDetails,
   });
 };
 
-const getAllstudents = async (req, res) => {
+const getAllStudents = async (req, res) => {
   const students = await prismaClient.student.findMany({
     select: {
       id: true,
@@ -50,14 +50,22 @@ const getAllstudents = async (req, res) => {
     },
   });
 
-  if (!students) {
-    throw new BadRequestError("No students found in database");
+  if (!students.length) {
+    throw new NotFoundError("No students found in the database");
   }
-  res.status(StatusCodes.OK).json({ students });
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    students,
+  });
 };
 
-const getAllstudentsBySection = async (req, res) => {
+const getAllStudentsBySection = async (req, res) => {
   const { faculty, semester, section } = req.body;
+
+  if (!faculty || !semester || !section) {
+    throw new BadRequestError("Faculty, semester, and section are required");
+  }
 
   const students = await prismaClient.student.findMany({
     where: { faculty, semester, section },
@@ -72,14 +80,22 @@ const getAllstudentsBySection = async (req, res) => {
     },
   });
 
-  if (!students) {
-    throw new BadRequestError("No students found in database");
+  if (!students.length) {
+    throw new NotFoundError("No students found in the specified section");
   }
-  res.status(StatusCodes.OK).json({ students });
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    students,
+  });
 };
 
-const getAllstudentsByFaculty = async (req, res) => {
+const getAllStudentsByFaculty = async (req, res) => {
   const { faculty, semester } = req.body;
+
+  if (!faculty || !semester) {
+    throw new BadRequestError("Faculty and semester are required");
+  }
 
   const students = await prismaClient.student.findMany({
     where: { faculty, semester },
@@ -94,10 +110,14 @@ const getAllstudentsByFaculty = async (req, res) => {
     },
   });
 
-  if (!students) {
-    throw new BadRequestError("No students found in database");
+  if (!students.length) {
+    throw new NotFoundError("No students found in the specified faculty");
   }
-  res.status(StatusCodes.OK).json({ students });
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    students,
+  });
 };
 
 const getAllTeachers = async (req, res) => {
@@ -109,16 +129,21 @@ const getAllTeachers = async (req, res) => {
       phone: true,
     },
   });
-  if (!teachers) {
-    throw new BadRequestError("No teachers found in database");
+
+  if (!teachers.length) {
+    throw new NotFoundError("No teachers found in the database");
   }
-  res.status(StatusCodes.OK).json({ teachers });
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    teachers,
+  });
 };
 
 export {
   getAllTeachers,
-  getAllstudents,
-  getAllstudentsBySection,
-  getAllstudentsByFaculty,
+  getAllStudents,
+  getAllStudentsBySection,
+  getAllStudentsByFaculty,
   myDetails,
 };

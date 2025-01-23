@@ -8,41 +8,37 @@ const authenticateUser = async (req, res, next) => {
   if (!token) {
     throw new UnauthenticatedError("Authentication failed, Please login");
   }
+
   try {
     const payload = await isTokenValid(token);
 
     const studentUser = await prismaClient.student.findUnique({
-      where: { email: payload.email },
+      where: { id: payload.id },
     });
 
-    //student vetiyo
+    const teacherUser = await prismaClient.teacher.findUnique({
+      where: { id: payload.id },
+    });
+
     if (studentUser) {
       req.user = {
         userId: payload.id,
         email: payload.email,
         role: studentUser.role,
       };
-      return next();
-    }
-    const teacherUser = await prismaClient.teacher.findUnique({
-      where: { email: payload.email },
-    });
-
-    //teacher vetiyo
-    if (teacherUser) {
+    } else if (teacherUser) {
       req.user = {
         userId: payload.id,
         email: payload.email,
         role: teacherUser.role,
       };
-      return next();
-    }
-
-    if (!studentUser || !teacherUser) {
+    } else {
       throw new UnauthenticatedError("User not found");
     }
+
     return next();
   } catch (error) {
+    console.error(error);
     throw new UnauthenticatedError("Authentication invalid");
   }
 };

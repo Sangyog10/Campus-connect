@@ -18,7 +18,7 @@ const assignSubjectToTeacher = async (req, res) => {
   }
 
   const teacher = await prismaClient.teacher.findUnique({
-    where: { id: parseInt(teacherId) },
+    where: { id: teacherId },
   });
   if (!teacher) {
     throw new NotFoundError("Teacher with the provided ID not found.");
@@ -75,6 +75,7 @@ const assignSubjectToTeacher = async (req, res) => {
       message: "Teacher assigned to the existing subject for this section.",
     });
   }
+
   const subjectName = await prismaClient.subject.findFirst({
     where: { subjectCode },
   });
@@ -109,7 +110,7 @@ const getAllSubjectOfTeacher = async (req, res) => {
   const subjects = await prismaClient.subject.findMany({
     where: {
       teachers: {
-        some: { id: parseInt(teacherId) },
+        some: { id: teacherId },
       },
     },
     select: {

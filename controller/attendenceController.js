@@ -39,24 +39,24 @@ const addAttendence = async (req, res) => {
   );
   res
     .status(StatusCodes.OK)
-    .json({ success: true, message: "Attendence addded successfully" });
+    .json({ success: true, message: "Attendance added successfully" });
 };
 
-//route to get the total attendence in each subject of a student
+//student route to get his/her attendence
 const getAttendenceOfSubject = async (req, res) => {
   const studentId = req.user.userId;
   if (!studentId) {
     throw new UnauthenticatedError("Please login");
   }
   const student = await prismaClient.student.findUnique({
-    where: { id: parseInt(studentId) },
+    where: { id: studentId },
   });
 
   if (!student) {
     throw new NotFoundError("Student not found");
   }
   const attendanceRecords = await prismaClient.attendance.findMany({
-    where: { studentId: parseInt(studentId) },
+    where: { studentId: studentId },
     include: {
       subject: true,
     },
@@ -114,7 +114,7 @@ const getAttendenceOfSubject = async (req, res) => {
   });
 };
 
-//route to get all the attendence details of the subject that a teacher teaches
+// route to get all the attendance details of the subject that a teacher teaches
 const getSubjectAttendance = async (req, res) => {
   const teacherId = req.user.userId;
   const { subjectCode, section } = req.body;
@@ -132,7 +132,7 @@ const getSubjectAttendance = async (req, res) => {
       subjectCode,
       section,
       teachers: {
-        some: { id: parseInt(teacherId) },
+        some: { id: teacherId },
       },
     },
     select: {
@@ -152,7 +152,7 @@ const getSubjectAttendance = async (req, res) => {
     by: ["studentId"],
     where: {
       subjectId: subject.id,
-      teacherId: parseInt(teacherId),
+      teacherId,
     },
     _count: {
       _all: true,
@@ -163,7 +163,7 @@ const getSubjectAttendance = async (req, res) => {
     by: ["studentId"],
     where: {
       subjectId: subject.id,
-      teacherId: parseInt(teacherId),
+      teacherId,
       present: true,
     },
     _count: {

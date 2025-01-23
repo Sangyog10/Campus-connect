@@ -25,8 +25,8 @@ const addMarks = async (req, res) => {
   for (const { studentId, marks } of marksData) {
     const existingMarks = await prismaClient.internalMarks.findFirst({
       where: {
-        studentId: Number(studentId),
-        subjectId: Number(subjectId),
+        studentId,
+        subjectId,
       },
     });
 
@@ -39,9 +39,9 @@ const addMarks = async (req, res) => {
     const newMarks = await prismaClient.internalMarks.create({
       data: {
         marks: Number(marks),
-        teacherId: Number(teacherId),
-        subjectId: Number(subjectId),
-        studentId: Number(studentId),
+        teacherId,
+        subjectId,
+        studentId,
       },
     });
     createdMarks.push(newMarks);
@@ -59,7 +59,7 @@ const getIndividualMarks = async (req, res) => {
     throw new UnauthorizedError("Please login");
   }
   const student = await prismaClient.student.findUnique({
-    where: { id: Number(studentId) },
+    where: { id: studentId },
     include: {
       internalMarks: {
         include: {

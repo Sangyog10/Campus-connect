@@ -15,7 +15,7 @@ const addNotes = async (req, res) => {
     throw new UnauthorizedError("Please login");
   }
   if (!title || !semester || !section || !subjectId || !file || !faculty) {
-    throw new BadRequestError("All feilds are requried");
+    throw new BadRequestError("All fields are required");
   }
 
   const newNote = await prismaClient.notes.create({
@@ -25,8 +25,8 @@ const addNotes = async (req, res) => {
       semester,
       faculty,
       section,
-      subjectId: Number(subjectId),
-      teacherId: Number(teacherId),
+      subjectId,
+      teacherId,
     },
   });
   res.status(StatusCodes.OK).json({
@@ -41,7 +41,7 @@ const getNotes = async (req, res) => {
     throw new UnauthorizedError("Please login");
   }
   const student = await prismaClient.student.findUnique({
-    where: { id: Number(studentId) },
+    where: { id: studentId },
     select: {
       faculty: true,
       semester: true,
@@ -83,9 +83,6 @@ const getNotes = async (req, res) => {
     id: note.id,
     title: note.title,
     fileUrl: note.file,
-    // fileUrl: note.file
-    //   ? path.join(`http://localhost:3000/uploads/${note.file}`, note.file)
-    //   : null,
     subjectName: note.subject.name,
     teacherName: note.teacher.name,
     semester: note.semester,

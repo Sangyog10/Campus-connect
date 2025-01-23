@@ -8,7 +8,7 @@ import {
 } from "../errors/index.js";
 
 const addSubject = async (req, res) => {
-  const { name, subjectCode, faculty, semester } = req.body;
+  const { name, subjectCode, faculty, semester, section } = req.body;
 
   if (!subjectCode || !faculty || !semester || !name) {
     throw new BadRequestError("Please enter all details");
@@ -19,11 +19,14 @@ const addSubject = async (req, res) => {
       subjectCode,
       faculty,
       semester,
+      section,
     },
   });
 
   if (isSubjectAdded) {
-    throw new BadRequestError("This subject has already been added");
+    throw new BadRequestError(
+      "This subject has already been added to this section"
+    );
   }
 
   const subject = await prismaClient.subject.create({
@@ -32,6 +35,7 @@ const addSubject = async (req, res) => {
       subjectCode,
       faculty,
       semester,
+      section,
     },
   });
 
@@ -47,9 +51,11 @@ const addSubject = async (req, res) => {
  */
 const getSubjectsByFaculty = async (req, res) => {
   const { faculty, semester } = req.body;
+
   if (!faculty || !semester) {
     throw new BadRequestError("Faculty and semester are required");
   }
+
   const subjects = await prismaClient.subject.findMany({
     where: {
       faculty,
@@ -61,12 +67,15 @@ const getSubjectsByFaculty = async (req, res) => {
       faculty: true,
       semester: true,
       subjectCode: true,
+      section: true,
     },
   });
+
   if (subjects.length === 0) {
-    throw new NotFoundError("No books found , please add the books");
+    throw new NotFoundError("No subjects found, please add the subjects");
   }
-  res.status(StatusCodes.OK).json({ success: true, subjects: subjects });
+
+  res.status(StatusCodes.OK).json({ success: true, subjects });
 };
 
 export { addSubject, getSubjectsByFaculty };
