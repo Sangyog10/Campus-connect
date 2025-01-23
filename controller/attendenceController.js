@@ -24,11 +24,16 @@ const addAttendence = async (req, res) => {
     throw new NotFoundError("Subject with this id not found");
   }
 
-  const attendanceRecords = await Promise.all(
-    attendanceData.map(async (record) => {
+  const date = new Date(Date.now());
+
+  const attendanceRecords = await prismaClient.$transaction(
+    attendanceData.map((record) => {
+      if (!record.studentId || typeof record.present !== "boolean") {
+        throw new BadRequestError("Invalid attendance record");
+      }
       return prismaClient.attendance.create({
         data: {
-          date: new Date(Date.now()),
+          date,
           present: record.present,
           teacherId,
           subjectId,
