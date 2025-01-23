@@ -148,6 +148,13 @@ const getSubjectAttendance = async (req, res) => {
     throw new NotFoundError("The subject is not assigned to teacher");
   }
 
+  const totalClassesConducted = await prismaClient.attendance.count({
+    where: {
+      subjectId: subject.id,
+      teacherId,
+    },
+  });
+
   const attendanceRecords = await prismaClient.attendance.groupBy({
     by: ["studentId"],
     where: {
@@ -192,7 +199,7 @@ const getSubjectAttendance = async (req, res) => {
         name: student.name,
         email: student.email,
         totalClassesAttended: presentMap[record.studentId] || 0,
-        totalClassesConducted: record._count._all,
+        totalClassesConducted,
       };
     })
   );
