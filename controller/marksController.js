@@ -84,8 +84,76 @@ const getIndividualMarks = async (req, res) => {
   });
 };
 
+const getInternalMarksAddedByTeacher = async (req, res) => {
+  const teacherId = req.user.userId;
+
+  if (!teacherId) {
+    throw new UnauthorizedError("Please login");
+  }
+
+  const subjectsTaught = await prismaClient.subject.findMany({
+    where: {
+      teachers: {
+        some: { id: teacherId },
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
+  if (subjectsTaught.length === 0) {
+    throw new NotFoundError("No subjects assigned to this teacher.");
+  }
+
+  const subjectIds = subjectsTaught.map((subject) => subject.id);
+
+  const internalMarks = await prismaClient.internalMarks.findMany({
+    where: {
+      teacherId,
+      subjectId: {
+        in: subjectIds,
+      },
+    },
+    include: {
+      student: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      subject: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  const formattedMarks = internalMarks.map((mark) => ({
+    studentName: mark.student.name,
+    studentEmail: mark.student.email,
+    subjectName: mark.subject.name,
+    marks: mark.marks,
+  }));
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    data: formattedMarks,
+  });
+};
+
 const updateInternlMark = async (req, res) => {};
 
 const deleteInternalMarks = async (req, res) => {};
 
-export { addMarks, updateInternlMark, getIndividualMarks, deleteInternalMarks };
+export {
+  addMarks,
+  updateInternlMark,
+  getIndividualMarks,
+  deleteInternalMarks,
+  getInternalMarksAddedByTeacher,
+};

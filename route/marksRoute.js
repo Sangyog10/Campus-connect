@@ -4,6 +4,7 @@ import {
   updateInternlMark,
   getIndividualMarks,
   deleteInternalMarks,
+  getInternalMarksAddedByTeacher,
 } from "../controller/marksController.js";
 import {
   authenticateUser,
@@ -12,8 +13,15 @@ import {
 
 const router = Router();
 
-router.post("/add", authenticateUser, authorizeRoles("teacher"), addMarks);
 router.get("/my-marks", authenticateUser, getIndividualMarks);
+
+router.post("/add", authenticateUser, authorizeRoles("teacher"), addMarks);
+router.get(
+  "/details",
+  authenticateUser,
+  authorizeRoles("teacher"),
+  getInternalMarksAddedByTeacher
+);
 router.put("/", authenticateUser, authorizeRoles("teacher"), updateInternlMark);
 router.delete(
   "/",
