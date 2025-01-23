@@ -1,5 +1,6 @@
 import { prismaClient } from "../db/connect.js";
 import { StatusCodes } from "http-status-codes";
+import { uploadToCloudinary } from "../utils/multerConfig.js";
 import {
   NotFoundError,
   BadRequestError,
@@ -9,7 +10,7 @@ import {
 const addNotes = async (req, res) => {
   const { title, faculty, semester, section, subjectId } = req.body;
   const teacherId = req.user.userId;
-  const file = req.file; //file from frontend
+  const file = req.file;
 
   if (!teacherId) {
     throw new UnauthorizedError("Please login");
@@ -18,10 +19,16 @@ const addNotes = async (req, res) => {
     throw new BadRequestError("All fields are required");
   }
 
+  if (!file || !file.buffer) {
+    throw new BadRequestError("No file uploaded or file is missing buffer");
+  }
+
+  const cloudinaryUploadResponse = await uploadToCloudinary(file.buffer);
+
   const newNote = await prismaClient.notes.create({
     data: {
       title,
-      file: file.path,
+      file: cloudinaryUploadResponse.secure_url,
       semester,
       faculty,
       section,

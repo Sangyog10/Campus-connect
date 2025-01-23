@@ -1,16 +1,9 @@
 import multer from "multer";
-import path from "path";
+import cloudinary from "./cloudinary.js";
+import { Readable } from "stream";
 
 const multerConfig = () => {
-  const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, "uploads/notes/"); // Directory to store uploaded files
-    },
-    filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      cb(null, uniqueSuffix + "-" + file.originalname);
-    },
-  });
+  const storage = multer.memoryStorage();
 
   const fileFilter = (req, file, cb) => {
     if (file.mimetype === "application/pdf") {
@@ -22,9 +15,26 @@ const multerConfig = () => {
 
   return multer({
     storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, //limit to 5 mb
+    limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5 MB
     fileFilter,
   });
 };
 
-export { multerConfig };
+const uploadToCloudinary = (fileBuffer) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.v2.uploader.upload_stream(
+      { resource_type: "raw", folder: "notes_pdfs" },
+      (error, result) => {
+        if (error) {
+          return reject(error);
+        }
+        resolve(result);
+      }
+    );
+
+    const stream = Readable.from(fileBuffer);
+    stream.pipe(uploadStream);
+  });
+};
+
+export { multerConfig, uploadToCloudinary };
