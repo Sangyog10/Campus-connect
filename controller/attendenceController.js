@@ -8,9 +8,9 @@ import {
 } from "../errors/index.js";
 
 const addAttendence = async (req, res) => {
-  const { date, attendanceData, subjectId } = req.body;
+  const { attendanceData, subjectId } = req.body;
   const teacherId = req.user.userId;
-  if (!date || !attendanceData || !subjectId) {
+  if (!attendanceData || !subjectId) {
     throw new BadRequestError("Provide all credentials");
   }
   if (!teacherId) {
