@@ -6,6 +6,7 @@ import { Router } from "express";
 import {
   assignSubjectToTeacher,
   getAllSubjectOfTeacher,
+  deleteSubjectFromTeacher,
 } from "../controller/teacherController.js";
 
 const router = Router();
@@ -21,6 +22,13 @@ router.post(
   authenticateUser,
   authorizeRoles("teacher"),
   assignSubjectToTeacher
+);
+
+router.delete(
+  "/delete",
+  authenticateUser,
+  authorizeRoles("teacher"),
+  deleteSubjectFromTeacher
 );
 
 export default router;

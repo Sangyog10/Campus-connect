@@ -115,12 +115,6 @@ const getAttendenceOfSubject = async (req, res) => {
   });
 };
 
-/**
- * fix:
- * 1.(totalClassConducted) while adding all false, the total attencde increase accoring to student number
- * 2.
- */
-
 // route to get all the attendance details of the subject that a teacher teaches
 const getSubjectAttendance = async (req, res) => {
   const teacherId = req.user.userId;

@@ -133,4 +133,55 @@ const getAllSubjectOfTeacher = async (req, res) => {
   });
 };
 
-export { assignSubjectToTeacher, getAllSubjectOfTeacher };
+const deleteSubjectFromTeacher = async (req, res) => {
+  const teacherId = req.user.userId;
+  const { subjectCode, section, faculty, semester } = req.body;
+
+  if (!teacherId) {
+    throw new UnauthenticatedError("Please login");
+  }
+
+  if (!subjectCode || !section || !faculty || !semester) {
+    throw new BadRequestError("Please provide all details");
+  }
+
+  const existingSubject = await prismaClient.subject.findFirst({
+    where: {
+      subjectCode,
+      faculty,
+      semester,
+      section,
+      teachers: {
+        some: { id: teacherId },
+      },
+    },
+    select: {
+      id: true,
+      teachers: true,
+    },
+  });
+
+  if (!existingSubject) {
+    throw new NotFoundError("Subject not assigned to this teacher.");
+  }
+
+  await prismaClient.subject.update({
+    where: { id: existingSubject.id },
+    data: {
+      teachers: {
+        disconnect: { id: teacherId },
+      },
+    },
+  });
+
+  return res.status(StatusCodes.OK).json({
+    success: true,
+    message: "Subject unassigned from the teacher successfully.",
+  });
+};
+
+export {
+  assignSubjectToTeacher,
+  getAllSubjectOfTeacher,
+  deleteSubjectFromTeacher,
+};
