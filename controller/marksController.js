@@ -38,7 +38,7 @@ const addMarks = async (req, res) => {
 
     const newMarks = await prismaClient.internalMarks.create({
       data: {
-        marks: Number(marks),
+        marks: marks,
         teacherId,
         subjectId,
         studentId,

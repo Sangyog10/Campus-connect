@@ -78,7 +78,7 @@ model Attendance {
 
 model InternalMarks {
   id      String   @id @default(cuid())
-  marks   Float
+  marks   String
   section Section?
 
   teacherId String
