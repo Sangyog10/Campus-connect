@@ -86,13 +86,20 @@ const getIndividualMarks = async (req, res) => {
 
 const getInternalMarksAddedByTeacher = async (req, res) => {
   const teacherId = req.user.userId;
+  const { subjectCode, section } = req.body;
 
   if (!teacherId) {
     throw new UnauthorizedError("Please login");
   }
 
-  const subjectsTaught = await prismaClient.subject.findMany({
+  if (!subjectCode || !section) {
+    throw new BadRequestError("Please provide subjectCode and section.");
+  }
+
+  const subject = await prismaClient.subject.findFirst({
     where: {
+      subjectCode,
+      section,
       teachers: {
         some: { id: teacherId },
       },
@@ -103,18 +110,16 @@ const getInternalMarksAddedByTeacher = async (req, res) => {
     },
   });
 
-  if (subjectsTaught.length === 0) {
-    throw new NotFoundError("No subjects assigned to this teacher.");
+  if (!subject) {
+    throw new NotFoundError(
+      "Subject with the given code and section is not assigned to this teacher."
+    );
   }
-
-  const subjectIds = subjectsTaught.map((subject) => subject.id);
 
   const internalMarks = await prismaClient.internalMarks.findMany({
     where: {
       teacherId,
-      subjectId: {
-        in: subjectIds,
-      },
+      subjectId: subject.id,
     },
     include: {
       student: {
@@ -124,24 +129,23 @@ const getInternalMarksAddedByTeacher = async (req, res) => {
           email: true,
         },
       },
-      subject: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
     },
   });
+
+  if (internalMarks.length === 0) {
+    throw new NotFoundError("No internal marks found for this subject.");
+  }
 
   const formattedMarks = internalMarks.map((mark) => ({
     studentName: mark.student.name,
     studentEmail: mark.student.email,
-    subjectName: mark.subject.name,
+    subjectName: subject.name,
     marks: mark.marks,
   }));
 
   res.status(StatusCodes.OK).json({
     success: true,
+    message: "Internal marks fetched successfully.",
     data: formattedMarks,
   });
 };

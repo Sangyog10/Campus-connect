@@ -16,7 +16,7 @@ const router = Router();
 router.get("/my-marks", authenticateUser, getIndividualMarks);
 
 router.post("/add", authenticateUser, authorizeRoles("teacher"), addMarks);
-router.get(
+router.post(
   "/details",
   authenticateUser,
   authorizeRoles("teacher"),
