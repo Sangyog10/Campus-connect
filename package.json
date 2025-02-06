@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "echo DATABASE_URL=$DATABASE_URL > .env && prisma generate && prisma migrate deploy"
+    "postinstall": "echo DATABASE_URL=$DATABASE_URL > .env && cat .env && npx prisma generate && npx prisma migrate deploy"
   },
   "repository": {
     "type": "git",
