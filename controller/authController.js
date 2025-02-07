@@ -11,77 +11,84 @@ import { hashPassword, verifyPassword } from "../utils/verify.js";
 
 const registerTeacher = async (req, res) => {
   const { name, email, password, phone } = req.body;
+
   if (!email || !password || !name || !phone) {
-    throw new BadRequestError("Enter all credentials");
+    throw new BadRequestError("All fields are required");
   }
-  const emailExists = await prismaClient.teacher.findFirst({
-    where: {
-      email,
-    },
+
+  const emailExists = await prismaClient.teacher.findUnique({
+    where: { email },
   });
+
   if (emailExists) {
     throw new BadRequestError("Account already exists");
   }
 
   const hashedPassword = await hashPassword(password);
-  const teacher = await prismaClient.teacher.create({
-    data: { name, email, password: hashedPassword, phone },
+
+  await prismaClient.teacher.create({
+    data: {
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+    },
   });
-  res
-    .status(StatusCodes.CREATED)
-    .json({ success: true, message: "Teacher registered successfully" });
+
+  res.status(StatusCodes.CREATED).json({
+    success: true,
+    message: "Teacher registered successfully",
+  });
 };
 
 const loginTeacher = async (req, res) => {
   const { email, password } = req.body;
+
   if (!email || !password) {
-    throw new BadRequestError("Email and Password is required");
+    throw new BadRequestError("Email and Password are required");
   }
-  const isTeacherPresent = await prismaClient.teacher.findUnique({
-    where: {
-      email,
-    },
+
+  const teacher = await prismaClient.teacher.findUnique({
+    where: { email },
   });
-  if (!isTeacherPresent) {
+
+  if (!teacher) {
     throw new BadRequestError("Teacher is not registered");
   }
-  const isCorrectPassword = await verifyPassword(
-    password,
-    isTeacherPresent.password
-  );
 
-  if (!isCorrectPassword) {
-    throw new UnauthenticatedError("Please provide correct credentials");
+  const isPasswordValid = await verifyPassword(password, teacher.password);
+
+  if (!isPasswordValid) {
+    throw new UnauthenticatedError("Invalid credentials");
   }
 
-  //attach cookie
-  const tokenUser = { id: isTeacherPresent.id, email: isTeacherPresent.email };
+  const tokenUser = { id: teacher.id, email: teacher.email };
   attachCookiesToResponse({ res, user: tokenUser });
 
-  res
-    .status(StatusCodes.ACCEPTED)
-    .json({ success: true, message: "Teacher logged in successfully" });
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: "Teacher logged in successfully",
+  });
 };
 
-/**
- * phone number will be used as default password while registering student
- */
 const registerStudent = async (req, res) => {
   const { name, email, phone, semester, section, faculty } = req.body;
+
   if (!name || !email || !phone || !semester || !section || !faculty) {
-    throw new BadRequestError("Enter all credentials");
+    throw new BadRequestError("All fields are required");
   }
-  const emailExists = await prismaClient.student.findFirst({
-    where: {
-      email,
-    },
+
+  const emailExists = await prismaClient.student.findUnique({
+    where: { email },
   });
+
   if (emailExists) {
     throw new BadRequestError("Account already exists");
   }
+
   const hashedPassword = await hashPassword(phone);
 
-  const student = await prismaClient.student.create({
+  await prismaClient.student.create({
     data: {
       name,
       email,
@@ -92,38 +99,41 @@ const registerStudent = async (req, res) => {
       password: hashedPassword,
     },
   });
-  res
-    .status(StatusCodes.CREATED)
-    .json({ success: true, message: "Student registered successfully" });
+
+  res.status(StatusCodes.CREATED).json({
+    success: true,
+    message: "Student registered successfully",
+  });
 };
 
 const loginStudent = async (req, res) => {
   const { email, password } = req.body;
+
   if (!email || !password) {
-    throw new BadRequestError("Email and Password is required");
+    throw new BadRequestError("Email and Password are required");
   }
-  const isStudentPresent = await prismaClient.student.findUnique({
-    where: {
-      email,
-    },
+
+  const student = await prismaClient.student.findUnique({
+    where: { email },
   });
-  if (!isStudentPresent) {
+
+  if (!student) {
     throw new BadRequestError("Student is not registered");
   }
-  const isCorrectPassword = await verifyPassword(
-    password,
-    isStudentPresent.password
-  );
-  if (!isCorrectPassword) {
-    throw new UnauthenticatedError("Please provide correct credentials");
+
+  const isPasswordValid = await verifyPassword(password, student.password);
+
+  if (!isPasswordValid) {
+    throw new UnauthenticatedError("Invalid credentials");
   }
-  //attach cookie to response
-  const tokenUser = { id: isStudentPresent.id, email: isStudentPresent.email };
+
+  const tokenUser = { id: student.id, email: student.email };
   attachCookiesToResponse({ res, user: tokenUser });
 
-  res
-    .status(StatusCodes.CREATED)
-    .json({ success: true, message: "Student logged in successfully" });
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: "Student logged in successfully",
+  });
 };
 
 export { registerStudent, registerTeacher, loginStudent, loginTeacher };

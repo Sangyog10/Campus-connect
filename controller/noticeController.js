@@ -20,10 +20,11 @@ const addNotice = async (req, res) => {
     !subjectId ||
     !faculty
   ) {
-    throw new NotFoundError("All feilds are requried");
+    throw new NotFoundError("All fields are required");
   }
+
   const subject = await prismaClient.subject.findUnique({
-    where: { id: Number(subjectId) },
+    where: { id: subjectId },
   });
 
   if (!subject) {
@@ -40,14 +41,14 @@ const addNotice = async (req, res) => {
       faculty,
       semester,
       section: section.toUpperCase(),
-      subjectId: Number(subjectId),
-      teacherId: Number(teacherId),
+      subjectId: subjectId,
+      teacherId: teacherId,
     },
   });
+
   res.status(StatusCodes.CREATED).json({
     success: true,
-    message: "Notice created and dispatched successfully",
-    data: notice,
+    message: "Notice created successfully",
   });
 };
 
@@ -56,8 +57,15 @@ const getNotice = async (req, res) => {
   if (!userId) {
     throw new UnauthenticatedError("Please login");
   }
+
   const student = await prismaClient.student.findUnique({
-    where: { id: Number(userId) },
+    where: { id: userId },
+    select: {
+      id: true,
+      faculty: true,
+      section: true,
+      semester: true,
+    },
   });
 
   if (!student) {
@@ -65,6 +73,11 @@ const getNotice = async (req, res) => {
   }
 
   const notices = await prismaClient.notice.findMany({
+    where: {
+      section: student.section,
+      semester: student.semester,
+      faculty: student.faculty,
+    },
     include: {
       subject: {
         select: {
@@ -78,6 +91,7 @@ const getNotice = async (req, res) => {
       },
     },
   });
+
   const formattedNotices = notices.map((notice) => ({
     id: notice.id,
     title: notice.title,
@@ -90,7 +104,7 @@ const getNotice = async (req, res) => {
 
   res.status(StatusCodes.OK).json({
     success: true,
-    notice: formattedNotices,
+    notices: formattedNotices,
   });
 };
 

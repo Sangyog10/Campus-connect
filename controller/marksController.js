@@ -25,8 +25,8 @@ const addMarks = async (req, res) => {
   for (const { studentId, marks } of marksData) {
     const existingMarks = await prismaClient.internalMarks.findFirst({
       where: {
-        studentId: Number(studentId),
-        subjectId: Number(subjectId),
+        studentId,
+        subjectId,
       },
     });
 
@@ -38,10 +38,10 @@ const addMarks = async (req, res) => {
 
     const newMarks = await prismaClient.internalMarks.create({
       data: {
-        marks: Number(marks),
-        teacherId: Number(teacherId),
-        subjectId: Number(subjectId),
-        studentId: Number(studentId),
+        marks: marks,
+        teacherId,
+        subjectId,
+        studentId,
       },
     });
     createdMarks.push(newMarks);
@@ -59,7 +59,7 @@ const getIndividualMarks = async (req, res) => {
     throw new UnauthorizedError("Please login");
   }
   const student = await prismaClient.student.findUnique({
-    where: { id: Number(studentId) },
+    where: { id: studentId },
     include: {
       internalMarks: {
         include: {
@@ -84,8 +84,80 @@ const getIndividualMarks = async (req, res) => {
   });
 };
 
+const getInternalMarksAddedByTeacher = async (req, res) => {
+  const teacherId = req.user.userId;
+  const { subjectCode, section } = req.body;
+
+  if (!teacherId) {
+    throw new UnauthorizedError("Please login");
+  }
+
+  if (!subjectCode || !section) {
+    throw new BadRequestError("Please provide subjectCode and section.");
+  }
+
+  const subject = await prismaClient.subject.findFirst({
+    where: {
+      subjectCode,
+      section,
+      teachers: {
+        some: { id: teacherId },
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
+  if (!subject) {
+    throw new NotFoundError(
+      "Subject with the given code and section is not assigned to this teacher."
+    );
+  }
+
+  const internalMarks = await prismaClient.internalMarks.findMany({
+    where: {
+      teacherId,
+      subjectId: subject.id,
+    },
+    include: {
+      student: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+
+  if (internalMarks.length === 0) {
+    throw new NotFoundError("No internal marks found for this subject.");
+  }
+
+  const formattedMarks = internalMarks.map((mark) => ({
+    studentName: mark.student.name,
+    studentEmail: mark.student.email,
+    subjectName: subject.name,
+    marks: mark.marks,
+  }));
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: "Internal marks fetched successfully.",
+    data: formattedMarks,
+  });
+};
+
 const updateInternlMark = async (req, res) => {};
 
 const deleteInternalMarks = async (req, res) => {};
 
-export { addMarks, updateInternlMark, getIndividualMarks, deleteInternalMarks };
+export {
+  addMarks,
+  updateInternlMark,
+  getIndividualMarks,
+  deleteInternalMarks,
+  getInternalMarksAddedByTeacher,
+};

@@ -1,8 +1,8 @@
 import {
   getAllTeachers,
-  getAllstudents,
-  getAllstudentsBySection,
-  getAllstudentsByFaculty,
+  getAllStudents,
+  getAllStudentsBySection,
+  getAllStudentsByFaculty,
   myDetails,
 } from "../controller/userController.js";
 import {
@@ -14,9 +14,9 @@ import { Router } from "express";
 const router = Router();
 
 router.get("/me", authenticateUser, myDetails);
-router.post("/section", authenticateUser, getAllstudentsBySection);
-router.post("/faculty", authenticateUser, getAllstudentsByFaculty);
-router.get("/students", authenticateUser, getAllstudents);
+router.post("/section", authenticateUser, getAllStudentsBySection);
+router.post("/faculty", authenticateUser, getAllStudentsByFaculty);
+router.get("/students", authenticateUser, getAllStudents);
 router.get("/teachers", authenticateUser, getAllTeachers);
 
 export default router;
