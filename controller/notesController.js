@@ -77,9 +77,9 @@ const getNotes = async (req, res) => {
         select: { name: true },
       },
     },
-    orderBy: {
-      createdAt: "desc",
-    },
+    // orderBy: {
+    //   createdAt: "desc",
+    // },
   });
 
   if (notes.length === 0) {
