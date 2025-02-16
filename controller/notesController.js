@@ -47,6 +47,7 @@ const getNotes = async (req, res) => {
   if (!studentId) {
     throw new UnauthorizedError("Please login");
   }
+
   const student = await prismaClient.student.findUnique({
     where: { id: studentId },
     select: {
@@ -76,6 +77,9 @@ const getNotes = async (req, res) => {
         select: { name: true },
       },
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
   if (notes.length === 0) {
@@ -94,6 +98,7 @@ const getNotes = async (req, res) => {
     teacherName: note.teacher.name,
     semester: note.semester,
     section: note.section,
+    createdAt: note.createdAt, // Include timestamp for reference
   }));
 
   res.status(200).json({
