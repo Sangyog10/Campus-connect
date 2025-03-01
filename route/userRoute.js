@@ -14,9 +14,9 @@ import { Router } from "express";
 const router = Router();
 
 router.get("/me", authenticateUser, myDetails);
-router.post("/section", authenticateUser, getAllStudentsBySection);
-router.post("/faculty", authenticateUser, getAllStudentsByFaculty);
-router.get("/students", authenticateUser, getAllStudents);
-router.get("/teachers", authenticateUser, getAllTeachers);
+router.post("/section", getAllStudentsBySection);
+router.post("/faculty", getAllStudentsByFaculty);
+router.get("/students", getAllStudents);
+router.get("/teachers", getAllTeachers);
 
 export default router;
