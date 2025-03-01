@@ -81,6 +81,9 @@ const getAllStudentsBySection = async (req, res) => {
       section: true,
       faculty: true,
     },
+    orderBy: {
+      name: "asc",
+    },
   });
 
   if (!students.length) {
@@ -111,6 +114,9 @@ const getAllStudentsByFaculty = async (req, res) => {
       section: true,
       faculty: true,
     },
+    orderBy: {
+      name: "asc",
+    },
   });
 
   if (!students.length) {
@@ -130,6 +136,9 @@ const getAllTeachers = async (req, res) => {
       name: true,
       email: true,
       phone: true,
+    },
+    orderBy: {
+      name: "asc",
     },
   });
 
