@@ -108,6 +108,9 @@ const getInternalMarksAddedByTeacher = async (req, res) => {
       id: true,
       name: true,
     },
+    orderBy: {
+      name: "asc",
+    },
   });
 
   if (!subject) {

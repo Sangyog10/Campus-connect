@@ -148,6 +148,9 @@ const getSubjectAttendance = async (req, res) => {
       semester: true,
       section: true,
     },
+    orderBy: {
+      name: "asc",
+    },
   });
 
   if (!subject) {
