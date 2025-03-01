@@ -90,6 +90,9 @@ const getNotice = async (req, res) => {
         },
       },
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
   const formattedNotices = notices.map((notice) => ({

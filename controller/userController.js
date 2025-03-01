@@ -48,6 +48,9 @@ const getAllStudents = async (req, res) => {
       section: true,
       faculty: true,
     },
+    orderBy: {
+      name: "asc",
+    },
   });
 
   if (!students.length) {
