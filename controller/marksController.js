@@ -133,6 +133,11 @@ const getInternalMarksAddedByTeacher = async (req, res) => {
         },
       },
     },
+    orderBy: {
+      student: {
+        name: "asc",
+      },
+    },
   });
 
   if (internalMarks.length === 0) {

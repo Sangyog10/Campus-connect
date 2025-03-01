@@ -216,6 +216,8 @@ const getSubjectAttendance = async (req, res) => {
     })
   );
 
+  studentAttendance.sort((a, b) => a.name.localeCompare(b.name));
+
   res.status(StatusCodes.OK).json({
     success: true,
     subject: {
