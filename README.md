@@ -1,6 +1,6 @@
 # Campus Connect - Server
 
-Campus Connect is a platform designed to connect students within a campus, facilitating communication and collaboration. This repository contains the server-side code for the Campus Connect platform.
+Campus Connect is a platform designed to connect students within a campus, facilitating communication and collaboration. This project simplifies personalized attendance tracking, internal marks management,notice management, routine management, notes management etc.
 
 ## Installation
 
@@ -43,3 +43,10 @@ _Internal marks Page_
 
 ![Settings Page](</public/WhatsApp%20Image%202025-03-04%20at%209.06.26%20AM%20(1).jpeg>)
 _Notice Page_
+
+## Frontend
+
+The frontend code for Campus Connect is available in a separate repository. You can find it here:
+[Student App Frontend](https://github.com/Sanskar-Rijal/Student_App)
+
+[Teacher App Frontend](https://github.com/Sanskar-Rijal/Teacher-s-App)
